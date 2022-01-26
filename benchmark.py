@@ -3,6 +3,7 @@ import logging
 
 import os
 import time
+import numpy as np
 import yaml
 import argparse
 
@@ -59,8 +60,9 @@ def parse_time(time_data, result_dict):
     percentiles = [50., 80., 90., 95., 99., 99.9]
     buckets = np.percentile(time_data, percentiles).tolist()
     buckets_str = ",".join(["{}:{:.4f}".format(p, b) for p, b in zip(percentiles, buckets)])
-    if result_dict["total"] == 0:
-        result_dict["total"] = len(result_list)
+    # if result_dict["total"] == 0:
+    result_dict["total"] = len(time_data)
+    result_dict["result"] = {str(k): float(format(v, '.4f')) for k, v in zip(percentiles, buckets)}
 
 def parse_config(conf):
     return config
@@ -68,7 +70,7 @@ def parse_config(conf):
 class BenchmarkRunner():
     def __init__(self):
         self.warmup_times = 20
-        self.run_times = 10
+        self.run_times = 100
         self.time_data = []
         self.backend = None
 
@@ -86,6 +88,9 @@ class BenchmarkRunner():
             self.time_data.append(time.time() - begin)
 
     def report(self):
+        result = {}
+        parse_time(self.time_data, result)
+        print(result)
         pass
 
 def main():
