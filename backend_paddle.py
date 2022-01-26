@@ -43,7 +43,7 @@ class BackendPaddle(backend.Backend):
         if self.args.enable_profile:
             config.enable_profile()
         if self.args.enable_gpu:
-            config.enable_use_gpu(256, 0)
+            config.enable_use_gpu(256, self.args.gpu_id)
             if self.args.enable_trt:
                 config.enable_tensorrt_engine(
                     precision_mode=paddle_infer.PrecisionType.Float32,
