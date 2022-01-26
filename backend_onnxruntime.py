@@ -29,9 +29,17 @@ class BackendOnnxruntime(backend.Backend):
             raise ValueError(
                 f"The model dir {self.args.model_dir} does not exists!")
 
-        if self.args.enable_gpu:
+        sess_options = ort.SessionOptions()
+        if self.args.enable_mkldnn and not self.args.enable_gpu:
             self.sess = ort.InferenceSession(
-                model_file, providers=['CUDAExecutionProvider'])
+                model_file, providers=['CPUExecutionProvider'])
+        if self.args.enable_gpu:
+            if self.args.enable_trt:
+                self.sess = ort.InferenceSession(
+                    model_file, providers=['TensorrtExecutionProvider'])
+            else:
+                self.sess = ort.InferenceSession(
+                    model_file, providers=['CUDAExecutionProvider'])
 
         return self
 
@@ -39,8 +47,14 @@ class BackendOnnxruntime(backend.Backend):
         pass
 
     def predict(self, feed=None):
-        # self.sess.run(output_names, {input_name: input_data})
-        pass
+        # prepare input
+        input_data = {}
+        for i in range(len(self.sess.get_inputs())):
+            name = self.sess.get_inputs()[i].name
+            input_shape = [self.args.batch_size] + self.args.input_shape[i]
+            fake_input = np.ones(input_shape, dtype=np.float32)
+            input_data[name] = fake_input
+        self.sess.run(None, input_data)
 
 
 if __name__ == "__main__":
