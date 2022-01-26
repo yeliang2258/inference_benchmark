@@ -3,12 +3,65 @@ import logging
 
 import os
 import time
+import subprocess
+import signal
+
 import numpy as np
 import yaml
 import argparse
+import psutil
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
+
+
+class GPUStatBase(object):
+    nvidia_smi_path="nvidia-smi"
+    keys = (
+                'index',
+                'uuid',
+                'name',
+                'timestamp',
+                'memory.total',
+                'memory.free',
+                'memory.used',
+                'utilization.gpu',
+                'utilization.memory'
+            )
+    nu_opt=',nounits'
+
+class GPUStat(GPUStatBase):
+
+    def __init__(self, gpu_id=0):
+        self.result = {}
+        self.gpu_id = gpu_id
+
+    def start(self):
+        cmd = '%s --id=%s --query-gpu=%s --format=csv,noheader%s -lms 100' % (GPUStatBase.nvidia_smi_path, self.gpu_id, ','.join(GPUStatBase.keys), GPUStatBase.nu_opt)
+        # print(cmd)
+        self.routine = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE,shell=True,close_fds=True,preexec_fn=os.setsid)
+        time.sleep(1.0)
+
+    def stop(self):
+        try:
+            # os.killpg(p.pid, signal.SIGTERM)
+            os.killpg(self.routine.pid, signal.SIGUSR1)
+        except Exception as e:
+            print(e)
+            return
+
+        lines = self.routine.stdout.readlines()
+        # print(lines)
+        lines = [ line.strip().decode("utf-8") for line in lines if line.strip() != '' ]
+        gpu_info_list = [ { k: v for k, v in zip(GPUStatBase.keys, line.split(', ')) } for line in lines ]
+        result = gpu_info_list[0]
+        for item in gpu_info_list:
+            for k in item.keys():
+                result[k] = max(result[k], item[k])
+        self.result = result
+
+    def output(self):
+        return self.result
 
 def str2bool(v):
     if v.lower() == 'true':
@@ -73,10 +126,12 @@ class BenchmarkRunner():
         self.run_times = 100
         self.time_data = []
         self.backend = None
+        self.gpu_stat = GPUStat()
 
     def load(self, conf):
         self.backend = get_backend(conf.backend_type)
         self.backend.load(conf)
+        self.gpu_stat.start() 
     
     def run(self):
         for i in range(self.warmup_times):
@@ -88,10 +143,13 @@ class BenchmarkRunner():
             self.time_data.append(time.time() - begin)
 
     def report(self):
+        self.gpu_stat.stop() 
         result = {}
         parse_time(self.time_data, result)
+        print("##### latency stat #####")
         print(result)
-        pass
+        print("##### GPU stat #####")
+        print(self.gpu_stat.output())
 
 def main():
     args = parse_args()
