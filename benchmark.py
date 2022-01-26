@@ -126,11 +126,11 @@ class BenchmarkRunner():
         self.run_times = 100
         self.time_data = []
         self.backend = None
-        self.gpu_stat = GPUStat()
 
     def load(self, conf):
         self.backend = get_backend(conf.backend_type)
         self.backend.load(conf)
+        self.gpu_stat = GPUStat(conf.gpu_id)
         self.gpu_stat.start() 
     
     def run(self):
