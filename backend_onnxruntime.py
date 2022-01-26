@@ -10,6 +10,7 @@ except Exception as e:
 
 
 class BackendOnnxruntime(backend.Backend):
+
     def __init__(self):
         super(BackendOnnxruntime, self).__init__()
 
@@ -25,10 +26,12 @@ class BackendOnnxruntime(backend.Backend):
         if os.path.exists(self.args.model_dir):
             model_file = os.path.join(self.args.model_dir, "model.onnx")
         else:
-            raise ValueError(f"The model dir {self.args.model_dir} does not exists!")
+            raise ValueError(
+                f"The model dir {self.args.model_dir} does not exists!")
 
         if self.args.enable_gpu:
-            self.sess = ort.InferenceSession(model_file, providers=['CUDAExecutionProvider'])
+            self.sess = ort.InferenceSession(
+                model_file, providers=['CUDAExecutionProvider'])
 
         return self
 
@@ -38,6 +41,7 @@ class BackendOnnxruntime(backend.Backend):
     def predict(self, feed=None):
         # self.sess.run(output_names, {input_name: input_data})
         pass
+
 
 if __name__ == "__main__":
     runner = BenchmarkRunner()

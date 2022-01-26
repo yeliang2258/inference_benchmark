@@ -11,6 +11,7 @@ except Exception as e:
 
 
 class BackendPaddle(backend.Backend):
+
     def __init__(self):
         super(BackendPaddle, self).__init__()
 
@@ -28,7 +29,8 @@ class BackendPaddle(backend.Backend):
             model_params = os.path.join(self.args.model_dir, "model.pdiparams")
             config = paddle_infer.Config(model_file, model_params)
         else:
-            raise ValueError(f"The model dir {self.args.model_dir} does not exists!")
+            raise ValueError(
+                f"The model dir {self.args.model_dir} does not exists!")
 
         # enable memory optim
         config.enable_memory_optim()
@@ -50,7 +52,7 @@ class BackendPaddle(backend.Backend):
         #config.disable_glog_info()
         pass_builder = config.pass_builder()
         #pass_builder.append_pass('interpolate_mkldnn_pass')
-        
+
         self.predictor = paddle_infer.create_predictor(config)
 
         input_shape = self.args.input_shape
@@ -70,6 +72,7 @@ class BackendPaddle(backend.Backend):
             input_tensor.copy_from_cpu(fake_input.copy())
 
         return self
+
     def warmup(self):
         # for i range(self.args.warmup):
         #     self.predictor.run()
@@ -77,6 +80,7 @@ class BackendPaddle(backend.Backend):
 
     def predict(self, feed=None):
         self.predictor.run()
+
 
 if __name__ == "__main__":
     runner = BenchmarkRunner()
