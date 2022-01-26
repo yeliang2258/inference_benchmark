@@ -1,0 +1,16 @@
+# usage
+python benchmark.py --help
+```
+usage: benchmark.py [-h] [--batch_size BATCH_SIZE] [--input_shape INPUT_SHAPE]
+                    [--cpu_threads CPU_THREADS] [--precision {fp32,fp16}]
+                    [--backend_type {paddle,onnxruntime}] [--gpu_id GPU_ID]
+                    [--model_dir MODEL_DIR] [--enable_mkldnn ENABLE_MKLDNN]
+                    [--enable_gpu ENABLE_GPU] [--enable_trt ENABLE_TRT]
+                    [--enable_profile ENABLE_PROFILE]
+                    [--enable_benchmark ENABLE_BENCHMARK] --config_file
+                    CONFIG_FILE
+```
+
+```
+python benchmark.py --model_dir=data/faster_rcnn_swin_tiny_fpn_1x_coco/ --config_file=conf/config.yaml --input_shape=2:3,640,640:2 --enable_gpu=true 
+```
