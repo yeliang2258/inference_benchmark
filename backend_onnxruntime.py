@@ -34,12 +34,19 @@ class BackendOnnxruntime(backend.Backend):
             self.sess = ort.InferenceSession(
                 model_file, providers=['CPUExecutionProvider'])
         if self.args.enable_gpu:
+            option_maps = {}
+            option_maps['device_id'] = str(self.args.gpu_id)
+            provider_options = [option_maps]
             if self.args.enable_trt:
                 self.sess = ort.InferenceSession(
-                    model_file, providers=['TensorrtExecutionProvider'])
+                    model_file,
+                    providers=['TensorrtExecutionProvider'],
+                    provider_options=provider_options)
             else:
                 self.sess = ort.InferenceSession(
-                    model_file, providers=['CUDAExecutionProvider'])
+                    model_file,
+                    providers=['CUDAExecutionProvider'],
+                    provider_options=provider_options)
 
         return self
 
