@@ -97,6 +97,7 @@ def parse_args():
     parser.add_argument('--gpu_id', type=int, default=0)
     parser.add_argument('--model_dir', type=str)
     parser.add_argument('--enable_mkldnn', type=str2bool, default=True)
+    parser.add_argument('--enable_openvino', type=str2bool, default=False)
     parser.add_argument('--enable_gpu', type=str2bool, default=False)
     parser.add_argument('--enable_trt', type=str2bool, default=False)
     parser.add_argument('--enable_profile', type=str2bool, default=False)
@@ -132,6 +133,8 @@ def parse_time(time_data, result_dict):
         str(k): float(format(v, '.4f'))
         for k, v in zip(percentiles, buckets)
     }
+    avg_cost = np.mean(time_data)
+    result_dict["result"]['avg_cost'] = float(format(avg_cost, '.4f'))
 
 
 def parse_config(conf):
@@ -145,8 +148,10 @@ class BenchmarkRunner():
         self.run_times = 100
         self.time_data = []
         self.backend = None
+        self.conf = None
 
     def load(self, conf):
+        self.conf = conf
         self.backend = get_backend(conf.backend_type)
         self.backend.load(conf)
         self.gpu_stat = GPUStat(conf.gpu_id)
@@ -163,12 +168,23 @@ class BenchmarkRunner():
 
     def report(self):
         self.gpu_stat.stop()
+        perf_result = {}
+        parse_time(self.time_data, perf_result)
+
+        # print("##### latency stat #####")
+        # print(perf_result)
+        # print("##### GPU stat #####")
+        # print(self.gpu_stat.output())
+
+        print('##### benchmark result: #####')
         result = {}
-        parse_time(self.time_data, result)
-        print("##### latency stat #####")
+        result['detail'] = perf_result
+        result['backend_type'] = self.conf.backend_type
+        result['batch_size'] = self.conf.batch_size
+        result['precision'] = self.conf.precision
+        result['enable_gpu'] = self.conf.enable_gpu
+        result['enable_trt'] = self.conf.enable_trt
         print(result)
-        print("##### GPU stat #####")
-        print(self.gpu_stat.output())
 
 
 def main():
