@@ -24,7 +24,8 @@ python benchmark.py --model_dir=./ --config_file=conf/config.yaml --input_shape=
 
 # benchmark log
 
-python benchmark.py --model_dir=data/MobileNetV1/ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --enable_trt=true
+For example, run ```python benchmark.py --model_dir=data/MobileNetV1/ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --enable_trt=true```
+
 ```
 {'detail': {'total': 100, 'result': {'50.0': 0.001248, '80.0': 0.001256, '90.0': 0.00126, '95.0': 0.001264, '99.0': 0.001388, '99.9': 0.003239, 'avg_cost': 0.001273}}, 'backend_type': 'paddle', 'batch_size': 1, 'precision': None, 'enable_gpu': True, 'enable_trt': True}
 ```
