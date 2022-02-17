@@ -1,3 +1,17 @@
+#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import backend
 import os
 import sys
@@ -11,7 +25,6 @@ except Exception as e:
 
 
 class BackendPaddle(backend.Backend):
-
     def __init__(self):
         super(BackendPaddle, self).__init__()
 
@@ -25,8 +38,12 @@ class BackendPaddle(backend.Backend):
     def load(self, config_arg, inputs=None, outpus=None):
         self.args = config_arg
         if os.path.exists(self.args.model_dir):
-            model_file = os.path.join(self.args.model_dir, "model.pdmodel")
-            model_params = os.path.join(self.args.model_dir, "model.pdiparams")
+            # model_file = os.path.join(self.args.model_dir, "model.pdmodel")
+            # model_params = os.path.join(self.args.model_dir, "model.pdiparams")
+            model_file = os.path.join(self.args.model_dir + "/" +
+                                      self.args.paddle_model_file)
+            model_params = os.path.join(self.args.model_dir + "/" +
+                                        self.args.paddle_params_file)
             config = paddle_infer.Config(model_file, model_params)
         else:
             raise ValueError(
@@ -97,6 +114,8 @@ class BackendPaddle(backend.Backend):
             output_tensor = self.predictor.get_output_handle(name)
             output_data = output_tensor.copy_to_cpu()
             results.append(output_data)
+        if self.args.return_result:
+            return results
 
     def warmup(self):
         # for i range(self.args.warmup):
@@ -106,7 +125,9 @@ class BackendPaddle(backend.Backend):
     def predict(self, feed=None):
         self.set_input()
         self.predictor.run()
-        self.set_output()
+        output = self.set_output()
+        if self.args.return_result:
+            return output
 
 
 if __name__ == "__main__":
