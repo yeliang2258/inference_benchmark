@@ -104,7 +104,7 @@ def parse_args():
     parser.add_argument('--enable_benchmark', type=str2bool, default=True)
     parser.add_argument('--config_file',
                         type=str,
-                        required=True,
+                        required=False,
                         default="config/model.yaml")
     args = parser.parse_args()
     return args
@@ -179,6 +179,7 @@ class BenchmarkRunner():
         print('##### benchmark result: #####')
         result = {}
         result['detail'] = perf_result
+        result['gpu_stat'] = self.gpu_stat.output()
         result['backend_type'] = self.conf.backend_type
         result['batch_size'] = self.conf.batch_size
         result['precision'] = self.conf.precision
