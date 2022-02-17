@@ -27,5 +27,17 @@ python benchmark.py --model_dir=./ --config_file=conf/config.yaml --input_shape=
 For example, run ```python benchmark.py --model_dir=data/MobileNetV1/ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --enable_trt=true```
 
 ```
-{'detail': {'total': 100, 'result': {'50.0': 0.001248, '80.0': 0.001256, '90.0': 0.00126, '95.0': 0.001264, '99.0': 0.001388, '99.9': 0.003239, 'avg_cost': 0.001273}}, 'backend_type': 'paddle', 'batch_size': 1, 'precision': None, 'enable_gpu': True, 'enable_trt': True}
+{
+  'detail': {
+    'total': 100, 'result': {'50.0': 0.001189, '80.0': 0.001196, '90.0': 0.0012, '95.0': 0.001205, '99.0': 0.00122, '99.9': 0.00122, 'avg_cost': 0.001192}
+  }, 
+  'gpu_stat': {
+    'index': '2', 'uuid': 'GPU-76134271-1eb0-247b-fcad-06de45a5022f', 'name': 'Tesla T4', 'timestamp': '2022/02/17 07:35:24.467', 'memory.total': '15109', 'memory.free': '13135', 'memory.used': '2096', 'utilization.gpu': '2', 'utilization.memory': '0'
+  }, 
+  'backend_type': 'paddle', 
+  'batch_size': 1, 
+  'precision': None, 
+  'enable_gpu': True, 
+  'enable_trt': True
+}
 ```

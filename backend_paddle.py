@@ -55,7 +55,7 @@ class BackendPaddle(backend.Backend):
         config.set_cpu_math_library_num_threads(self.args.cpu_threads)
         config.switch_ir_optim(True)
         # debug
-        config.switch_ir_debug()
+        # config.switch_ir_debug()
         if self.args.enable_mkldnn and not self.args.enable_gpu:
             config.disable_gpu()
             config.enable_mkldnn()

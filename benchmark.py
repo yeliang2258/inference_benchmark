@@ -200,6 +200,7 @@ class BenchmarkRunner():
         print('##### benchmark result: #####')
         result = {}
         result['detail'] = perf_result
+        result['gpu_stat'] = self.gpu_stat.output()
         result['backend_type'] = self.conf.backend_type
         result['batch_size'] = self.conf.batch_size
         result['precision'] = self.conf.precision
