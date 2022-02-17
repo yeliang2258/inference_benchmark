@@ -130,11 +130,11 @@ def parse_time(time_data, result_dict):
     # if result_dict["total"] == 0:
     result_dict["total"] = len(time_data)
     result_dict["result"] = {
-        str(k): float(format(v, '.4f'))
+        str(k): float(format(v, '.6f'))
         for k, v in zip(percentiles, buckets)
     }
     avg_cost = np.mean(time_data)
-    result_dict["result"]['avg_cost'] = float(format(avg_cost, '.4f'))
+    result_dict["result"]['avg_cost'] = float(format(avg_cost, '.6f'))
 
 
 def parse_config(conf):

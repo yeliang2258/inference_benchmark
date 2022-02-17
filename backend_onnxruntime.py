@@ -30,6 +30,9 @@ class BackendOnnxruntime(backend.Backend):
                 f"The model dir {self.args.model_dir} does not exists!")
 
         sess_options = ort.SessionOptions()
+        if self.args.enable_openvino and not self.args.enable_gpu:
+            self.sess = ort.InferenceSession(
+                model_file, providers=['OpenVINOExecutionProvider'])
         if self.args.enable_mkldnn and not self.args.enable_gpu:
             self.sess = ort.InferenceSession(
                 model_file, providers=['CPUExecutionProvider'])
@@ -62,6 +65,7 @@ class BackendOnnxruntime(backend.Backend):
             fake_input = np.ones(input_shape, dtype=np.float32)
             input_data[name] = fake_input
         self.sess.run(None, input_data)
+        # output = self.sess.run(None, input_data)
 
 
 if __name__ == "__main__":

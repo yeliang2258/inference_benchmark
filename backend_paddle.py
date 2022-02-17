@@ -37,15 +37,21 @@ class BackendPaddle(backend.Backend):
         #config.disable_gpu()
         config.set_cpu_math_library_num_threads(self.args.cpu_threads)
         config.switch_ir_optim(True)
+        # debug
+        config.switch_ir_debug()
         if self.args.enable_mkldnn and not self.args.enable_gpu:
             config.disable_gpu()
             config.enable_mkldnn()
+        if not self.args.enable_mkldnn and not self.args.enable_gpu:
+            config.disable_gpu()
+            # config.enable_mkldnn()
         if self.args.enable_profile:
             config.enable_profile()
         if self.args.enable_gpu:
             config.enable_use_gpu(256, self.args.gpu_id)
             if self.args.enable_trt:
                 config.enable_tensorrt_engine(
+                    workspace_size=1 << 30,
                     precision_mode=paddle_infer.PrecisionType.Float32,
                     max_batch_size=20,
                     min_subgraph_size=3)
@@ -73,13 +79,34 @@ class BackendPaddle(backend.Backend):
 
         return self
 
+    def set_input(self):
+        # set input tensor
+        input_names = self.predictor.get_input_names()
+        for i, name in enumerate(input_names):
+            input_tensor = self.predictor.get_input_handle(name)
+            input_shape = [self.args.batch_size] + self.args.input_shape[i]
+            fake_input = np.ones(input_shape, dtype=np.float32)
+            input_tensor.reshape(input_shape)
+            input_tensor.copy_from_cpu(fake_input.copy())
+
+    def set_output(self):
+        results = []
+        # get out data from output tensor
+        output_names = self.predictor.get_output_names()
+        for i, name in enumerate(output_names):
+            output_tensor = self.predictor.get_output_handle(name)
+            output_data = output_tensor.copy_to_cpu()
+            results.append(output_data)
+
     def warmup(self):
         # for i range(self.args.warmup):
         #     self.predictor.run()
         pass
 
     def predict(self, feed=None):
+        self.set_input()
         self.predictor.run()
+        self.set_output()
 
 
 if __name__ == "__main__":
