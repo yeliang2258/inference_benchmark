@@ -74,10 +74,13 @@ class BackendOnnxruntime(backend.Backend):
         input_data = {}
         for i in range(len(self.sess.get_inputs())):
             name = self.sess.get_inputs()[i].name
-            input_shape = [self.args.batch_size] + self.args.input_shape[i]
+            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
+                input_shape = [self.args.batch_size] + self.args.yaml_config[
+                    "input_shape"][str(i)][1:]
+            else:
+                input_shape = self.args.yaml_config["input_shape"][str(i)]
             fake_input = np.ones(input_shape, dtype=np.float32)
             input_data[name] = fake_input
-        # self.sess.run(None, input_data)
         output = self.sess.run(None, input_data)
         if self.args.return_result:
             return output

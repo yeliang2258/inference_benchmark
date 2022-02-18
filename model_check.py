@@ -34,6 +34,7 @@ class ModelChecker():
     def __init__(self, args):
         self.args = args
         self.runner = BenchmarkRunner()
+        print("test yaml file path: ", self.args.config_file)
 
     def onnx_config(self):
         self.args.return_result = True
@@ -82,8 +83,10 @@ class ModelChecker():
                 f.write(self.args.model_dir + ": convert failed! \n")
             return
         print(">>>> start check model diff ...... ")
+
         self.paddle_config()
         self.runner.load(self.args)
+
         expect_result = self.runner.run()
 
         self.onnx_config()
@@ -100,18 +103,6 @@ class ModelChecker():
 
 def main():
     args = parse_args()
-    config = os.path.abspath(args.config_file)
-    if not os.path.exists(config):
-        log.error("{} not found".format(config_file))
-        sys.exit(1)
-
-    try:
-        fd = open(args.config_file)
-    except Exception as e:
-        raise ValueError("open config file failed.")
-
-    config = yaml.load(fd, yaml.FullLoader)
-    fd.close()
 
     checker = ModelChecker(args)
     checker.run()

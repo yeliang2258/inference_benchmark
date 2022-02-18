@@ -78,7 +78,7 @@ class BackendPaddle(backend.Backend):
 
         self.predictor = paddle_infer.create_predictor(config)
 
-        input_shape = self.args.input_shape
+        input_shape = self.args.yaml_config["input_shape"]
         print(input_shape)
         if len(input_shape) <= 0:
             raise Exception("input shape is empty.")
@@ -89,7 +89,11 @@ class BackendPaddle(backend.Backend):
         input_names = self.predictor.get_input_names()
         for i, name in enumerate(input_names):
             input_tensor = self.predictor.get_input_handle(name)
-            input_shape = [self.args.batch_size] + self.args.input_shape[i]
+            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
+                input_shape = [self.args.batch_size] + self.args.yaml_config[
+                    "input_shape"][str(i)][1:]
+            else:
+                input_shape = self.args.yaml_config["input_shape"][str(i)]
             fake_input = np.ones(input_shape, dtype=np.float32)
             input_tensor.reshape(input_shape)
             input_tensor.copy_from_cpu(fake_input.copy())
@@ -101,7 +105,11 @@ class BackendPaddle(backend.Backend):
         input_names = self.predictor.get_input_names()
         for i, name in enumerate(input_names):
             input_tensor = self.predictor.get_input_handle(name)
-            input_shape = [self.args.batch_size] + self.args.input_shape[i]
+            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
+                input_shape = [self.args.batch_size] + self.args.yaml_config[
+                    "input_shape"][str(i)][1:]
+            else:
+                input_shape = self.args.yaml_config["input_shape"][str(i)]
             fake_input = np.ones(input_shape, dtype=np.float32)
             input_tensor.reshape(input_shape)
             input_tensor.copy_from_cpu(fake_input.copy())

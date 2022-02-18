@@ -18,6 +18,7 @@ import os
 import time
 import subprocess
 import signal
+import sys
 
 import numpy as np
 import yaml
@@ -169,6 +170,21 @@ class BenchmarkRunner():
 
     def load(self, conf):
         self.conf = conf
+
+        config_path = os.path.abspath(self.conf.model_dir + "/" +
+                                      self.conf.config_file)
+        print("benchmark yaml path: ", config_path)
+        if not os.path.exists(config_path):
+            log.error("{} not found".format(config_path))
+            sys.exit(1)
+        try:
+            fd = open(config_path)
+        except Exception as e:
+            raise ValueError("open config file failed.")
+        yaml_config = yaml.load(fd, yaml.FullLoader)
+        fd.close()
+        self.conf.yaml_config = yaml_config
+
         self.backend = get_backend(conf.backend_type)
         self.backend.load(conf)
         self.gpu_stat = GPUStat(conf.gpu_id)
