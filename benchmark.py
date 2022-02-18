@@ -227,18 +227,6 @@ class BenchmarkRunner():
 
 def main():
     args = parse_args()
-    config = os.path.abspath(args.config_file)
-    if not os.path.exists(config):
-        log.error("{} not found".format(config_file))
-        sys.exit(1)
-
-    try:
-        fd = open(args.config_file)
-    except Exception as e:
-        raise ValueError("open config file failed.")
-
-    config = yaml.load(fd, yaml.FullLoader)
-    fd.close()
 
     runner = BenchmarkRunner()
     runner.load(args)
