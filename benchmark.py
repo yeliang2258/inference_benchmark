@@ -173,7 +173,6 @@ class BenchmarkRunner():
 
         config_path = os.path.abspath(self.conf.model_dir + "/" +
                                       self.conf.config_file)
-        print("benchmark yaml path: ", config_path)
         if not os.path.exists(config_path):
             log.error("{} not found".format(config_path))
             sys.exit(1)

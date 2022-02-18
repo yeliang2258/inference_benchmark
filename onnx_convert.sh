@@ -13,6 +13,7 @@ install_repo(){
 rm -r result.txt
 rm -r *.pdmodel
 rm -r *.dot
+
 echo "============ covert and diff check result =============" >> result.txt
 for dir in $(ls $MODELPATH)
 do
