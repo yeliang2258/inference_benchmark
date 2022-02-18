@@ -72,7 +72,7 @@ python benchmark.py --model_dir=data/faster_rcnn_swin_tiny_fpn_1x_coco/ --config
 python benchmark.py --model_dir=./ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --backend_type=onnxruntime --enable_trt=true
 ```
 
-### 3. Benchmark Log
+## 3. Benchmark Log
 
 For example, run ```python benchmark.py --model_dir=data/MobileNetV1/ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --enable_trt=true```
 
