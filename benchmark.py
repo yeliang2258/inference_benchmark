@@ -222,6 +222,11 @@ class BenchmarkRunner():
         result['enable_gpu'] = self.conf.enable_gpu
         result['enable_trt'] = self.conf.enable_trt
         print(result)
+        with open("result.txt", 'a+') as f:
+            f.write("model path: " + self.conf.model_dir + "\n")
+            for key, val in result.items():
+                f.write(key + " : " + str(val) + "\n")
+            f.write("\n")
 
 
 def main():

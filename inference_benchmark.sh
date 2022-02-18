@@ -8,6 +8,7 @@ batch_size=(1 8 16)
 config_file=config.yaml
 model_dir=./Models/TestModel2
 
+echo "============ Benchmark result =============" >> result.txt
 for backend_type in ${backend_type[@]};do
   if [ "$backend_type" = "onnxruntime" ];then
     if [ ! -f "$model_dir/model.onnx" ];then
