@@ -1,9 +1,24 @@
+#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 
 import os
 import time
 import subprocess
 import signal
+import sys
 
 import numpy as np
 import yaml
@@ -23,22 +38,22 @@ class GPUStatBase(object):
 
 
 class GPUStat(GPUStatBase):
-
     def __init__(self, gpu_id=0):
         self.result = {}
         self.gpu_id = gpu_id
 
     def start(self):
         cmd = '%s --id=%s --query-gpu=%s --format=csv,noheader%s -lms 100' % (
-            GPUStatBase.nvidia_smi_path, self.gpu_id, ','.join(
-                GPUStatBase.keys), GPUStatBase.nu_opt)
+            GPUStatBase.nvidia_smi_path, self.gpu_id,
+            ','.join(GPUStatBase.keys), GPUStatBase.nu_opt)
         # print(cmd)
-        self.routine = subprocess.Popen(cmd,
-                                        stderr=subprocess.STDOUT,
-                                        stdout=subprocess.PIPE,
-                                        shell=True,
-                                        close_fds=True,
-                                        preexec_fn=os.setsid)
+        self.routine = subprocess.Popen(
+            cmd,
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            shell=True,
+            close_fds=True,
+            preexec_fn=os.setsid)
         time.sleep(1.0)
 
     def stop(self):
@@ -90,22 +105,26 @@ def parse_args():
     parser.add_argument('--input_shape', type=str2list, default=[])
     parser.add_argument('--cpu_threads', type=int, default=1)
     parser.add_argument('--precision', type=str, choices=["fp32", "fp16"])
-    parser.add_argument('--backend_type',
-                        type=str,
-                        choices=["paddle", "onnxruntime"],
-                        default="paddle")
+    parser.add_argument(
+        '--backend_type',
+        type=str,
+        choices=["paddle", "onnxruntime"],
+        default="paddle")
     parser.add_argument('--gpu_id', type=int, default=0)
     parser.add_argument('--model_dir', type=str)
+    parser.add_argument(
+        '--paddle_model_file', type=str, default="model.pdmodel")
+    parser.add_argument(
+        '--paddle_params_file', type=str, default="model.pdiparams")
     parser.add_argument('--enable_mkldnn', type=str2bool, default=True)
     parser.add_argument('--enable_openvino', type=str2bool, default=False)
     parser.add_argument('--enable_gpu', type=str2bool, default=False)
     parser.add_argument('--enable_trt', type=str2bool, default=False)
     parser.add_argument('--enable_profile', type=str2bool, default=False)
     parser.add_argument('--enable_benchmark', type=str2bool, default=True)
-    parser.add_argument('--config_file',
-                        type=str,
-                        required=False,
-                        default="config/model.yaml")
+    parser.add_argument('--return_result', type=str2bool, default=False)
+    parser.add_argument(
+        '--config_file', type=str, required=True, default="config/model.yaml")
     args = parser.parse_args()
     return args
 
@@ -142,7 +161,6 @@ def parse_config(conf):
 
 
 class BenchmarkRunner():
-
     def __init__(self):
         self.warmup_times = 20
         self.run_times = 100
@@ -152,12 +170,30 @@ class BenchmarkRunner():
 
     def load(self, conf):
         self.conf = conf
+
+        config_path = os.path.abspath(self.conf.model_dir + "/" +
+                                      self.conf.config_file)
+        if not os.path.exists(config_path):
+            log.error("{} not found".format(config_path))
+            sys.exit(1)
+        try:
+            fd = open(config_path)
+        except Exception as e:
+            raise ValueError("open config file failed.")
+        yaml_config = yaml.load(fd, yaml.FullLoader)
+        fd.close()
+        self.conf.yaml_config = yaml_config
+
         self.backend = get_backend(conf.backend_type)
         self.backend.load(conf)
         self.gpu_stat = GPUStat(conf.gpu_id)
         self.gpu_stat.start()
 
     def run(self):
+        if self.conf.return_result:
+            output = self.backend.predict()
+            return output
+
         for i in range(self.warmup_times):
             self.backend.predict()
 
@@ -186,22 +222,15 @@ class BenchmarkRunner():
         result['enable_gpu'] = self.conf.enable_gpu
         result['enable_trt'] = self.conf.enable_trt
         print(result)
+        with open("result.txt", 'a+') as f:
+            f.write("model path: " + self.conf.model_dir + "\n")
+            for key, val in result.items():
+                f.write(key + " : " + str(val) + "\n")
+            f.write("\n")
 
 
 def main():
     args = parse_args()
-    config = os.path.abspath(args.config_file)
-    if not os.path.exists(config):
-        log.error("{} not found".format(config_file))
-        sys.exit(1)
-
-    try:
-        fd = open(args.config_file)
-    except Exception as e:
-        raise ValueError("open config file failed.")
-
-    config = yaml.load(fd, yaml.FullLoader)
-    fd.close()
 
     runner = BenchmarkRunner()
     runner.load(args)
