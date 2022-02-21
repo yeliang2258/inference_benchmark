@@ -1,6 +1,9 @@
 # Inference Benchmark
 ## Usage Steps
-First put all the models to be tested in the Models folder, each model folder must include the config.yaml file, and then run ```bash run.sh``` to get the test data.
+```
+1. Put all the models to be tested in the Models folder, each model folder must include one config.yaml file.
+2. run ```bash run.sh``` to get the inference benchmark data in result.txt.
+```
 
 We provide three scripts:  
 ```run.sh```: Start the inference benchmark test, which is divided into two steps: model conversion and benchmark output  
