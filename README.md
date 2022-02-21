@@ -2,7 +2,7 @@
 ## Usage Steps
 ```
 1. Put all the models to be tested in the Models folder, each model folder must include one config.yaml file.
-2. run ```bash run.sh``` to get the inference benchmark data in result.txt.
+2. run `bash run.sh` to get the inference benchmark data in result.txt.
 ```
 
 We provide three scripts:  
