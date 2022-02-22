@@ -16,6 +16,7 @@ import backend
 import os
 import sys
 import numpy as np
+from common import getdtype
 
 try:
     import onnxruntime as ort
@@ -74,12 +75,18 @@ class BackendOnnxruntime(backend.Backend):
         input_data = {}
         for i in range(len(self.sess.get_inputs())):
             name = self.sess.get_inputs()[i].name
-            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
+            if self.args.yaml_config["input_shape"][str(i)]["shape"][
+                    self.args.test_num][0] == -1:
                 input_shape = [self.args.batch_size] + self.args.yaml_config[
-                    "input_shape"][str(i)][1:]
+                    "input_shape"][str(i)]["shape"][self.args.test_num][1:]
+                dtype = self.args.yaml_config["input_shape"][str(i)]["dtype"][
+                    self.args.test_num]
             else:
-                input_shape = self.args.yaml_config["input_shape"][str(i)]
-            fake_input = np.ones(input_shape, dtype=np.float32)
+                input_shape = self.args.yaml_config["input_shape"][str(i)][
+                    "shape"][self.args.test_num]
+                dtype = self.args.yaml_config["input_shape"][str(i)]["dtype"][
+                    self.args.test_num]
+            fake_input = np.ones(input_shape, dtype=getdtype(dtype))
             input_data[name] = fake_input
         output = self.sess.run(None, input_data)
         if self.args.return_result:

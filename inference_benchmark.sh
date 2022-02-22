@@ -3,10 +3,8 @@ backend_type=(onnxruntime paddle)
 enable_trt=(true false)
 enable_gpu=(true false)
 gpu_id=0
-input_shape=(3,224,224)
 batch_size=(1 8 16)
 config_file=config.yaml
-# model_dir=./Models/infer_model
 export BASEPATH=$(cd `dirname $0`; pwd)
 export MODELPATH="$BASEPATH/Models"
 
@@ -34,7 +32,7 @@ test(){
         fi
     done
     for batch_size in ${batch_size[@]};do
-      python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --enable_gpu=true --gpu_id=2 --enable_trt=true --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
+      python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --enable_gpu=true --gpu_id=2 --enable_trt=false --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
     done
   done
 }

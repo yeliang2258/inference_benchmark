@@ -16,6 +16,7 @@ import backend
 import os
 import sys
 import numpy as np
+from common import getdtype
 
 try:
     import paddle
@@ -38,8 +39,6 @@ class BackendPaddle(backend.Backend):
     def load(self, config_arg, inputs=None, outpus=None):
         self.args = config_arg
         if os.path.exists(self.args.model_dir):
-            # model_file = os.path.join(self.args.model_dir, "model.pdmodel")
-            # model_params = os.path.join(self.args.model_dir, "model.pdiparams")
             model_file = os.path.join(self.args.model_dir + "/" +
                                       self.args.paddle_model_file)
             model_params = os.path.join(self.args.model_dir + "/" +
@@ -82,21 +81,6 @@ class BackendPaddle(backend.Backend):
         print(input_shape)
         if len(input_shape) <= 0:
             raise Exception("input shape is empty.")
-        # _ins_shape = [self.args.batch_size] + list(map(int, input_shape.split(',')))
-        # fake_input = np.ones(_ins_shape, dtype=np.float32)
-
-        # set input tensor
-        input_names = self.predictor.get_input_names()
-        for i, name in enumerate(input_names):
-            input_tensor = self.predictor.get_input_handle(name)
-            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
-                input_shape = [self.args.batch_size] + self.args.yaml_config[
-                    "input_shape"][str(i)][1:]
-            else:
-                input_shape = self.args.yaml_config["input_shape"][str(i)]
-            fake_input = np.ones(input_shape, dtype=np.float32)
-            input_tensor.reshape(input_shape)
-            input_tensor.copy_from_cpu(fake_input.copy())
 
         return self
 
@@ -105,12 +89,18 @@ class BackendPaddle(backend.Backend):
         input_names = self.predictor.get_input_names()
         for i, name in enumerate(input_names):
             input_tensor = self.predictor.get_input_handle(name)
-            if self.args.yaml_config["input_shape"][str(i)][0] == -1:
+            if self.args.yaml_config["input_shape"][str(i)]["shape"][
+                    self.args.test_num][0] == -1:
                 input_shape = [self.args.batch_size] + self.args.yaml_config[
-                    "input_shape"][str(i)][1:]
+                    "input_shape"][str(i)]["shape"][self.args.test_num][1:]
+                dtype = self.args.yaml_config["input_shape"][str(i)]["dtype"][
+                    self.args.test_num]
             else:
-                input_shape = self.args.yaml_config["input_shape"][str(i)]
-            fake_input = np.ones(input_shape, dtype=np.float32)
+                input_shape = self.args.yaml_config["input_shape"][str(i)][
+                    "shape"][self.args.test_num]
+                dtype = self.args.yaml_config["input_shape"][str(i)]["dtype"][
+                    self.args.test_num]
+            fake_input = np.ones(input_shape, dtype=getdtype(dtype))
             input_tensor.reshape(input_shape)
             input_tensor.copy_from_cpu(fake_input.copy())
 
