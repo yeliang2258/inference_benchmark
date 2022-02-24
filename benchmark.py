@@ -168,25 +168,10 @@ class BenchmarkRunner():
         self.backend = None
         self.conf = None
 
-    def load(self, conf):
-        self.conf = conf
-
-        config_path = os.path.abspath(self.conf.model_dir + "/" +
-                                      self.conf.config_file)
-        if not os.path.exists(config_path):
-            log.error("{} not found".format(config_path))
-            sys.exit(1)
-        try:
-            fd = open(config_path)
-        except Exception as e:
-            raise ValueError("open config file failed.")
-        yaml_config = yaml.load(fd, yaml.FullLoader)
-        fd.close()
-        self.conf.yaml_config = yaml_config
-
-        self.backend = get_backend(conf.backend_type)
-        self.backend.load(conf)
-        self.gpu_stat = GPUStat(conf.gpu_id)
+    def preset(self):
+        self.backend = get_backend(self.conf.backend_type)
+        self.backend.load(self.conf)
+        self.gpu_stat = GPUStat(self.conf.gpu_id)
         self.gpu_stat.start()
 
     def run(self):
@@ -207,11 +192,6 @@ class BenchmarkRunner():
         perf_result = {}
         parse_time(self.time_data, perf_result)
 
-        # print("##### latency stat #####")
-        # print(perf_result)
-        # print("##### GPU stat #####")
-        # print(self.gpu_stat.output())
-
         print('##### benchmark result: #####')
         result = {}
         result['detail'] = perf_result
@@ -228,14 +208,33 @@ class BenchmarkRunner():
                 f.write(key + " : " + str(val) + "\n")
             f.write("\n")
 
+    def test(self, conf):
+        self.conf = conf
+        config_path = os.path.abspath(self.conf.model_dir + "/" +
+                                      self.conf.config_file)
+        if not os.path.exists(config_path):
+            log.error("{} not found".format(config_path))
+            sys.exit(1)
+        try:
+            fd = open(config_path)
+        except Exception as e:
+            raise ValueError("open config file failed.")
+        yaml_config = yaml.load(fd, yaml.FullLoader)
+        fd.close()
+        self.conf.yaml_config = yaml_config
+
+        test_num = len(self.conf.yaml_config["input_shape"]["0"]["shape"])
+        for i in range(test_num):
+            self.conf.test_num = i
+            self.preset()
+            self.run()
+            self.report()
+
 
 def main():
     args = parse_args()
-
     runner = BenchmarkRunner()
-    runner.load(args)
-    runner.run()
-    runner.report()
+    runner.test(args)
 
 
 if __name__ == "__main__":

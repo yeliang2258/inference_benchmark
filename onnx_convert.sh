@@ -18,6 +18,7 @@ echo "============ covert and diff check result =============" >> result.txt
 for dir in $(ls $MODELPATH)
 do
   CONVERTPATH=$MODELPATH/$dir
+  echo " Model path: $CONVERTPATH"
   model_file=""
   params_file=""
   for file in $(ls $CONVERTPATH)
