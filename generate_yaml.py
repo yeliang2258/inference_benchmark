@@ -18,19 +18,20 @@ def generate_yaml(data, config_file):
     config = {}
     shape_info = {}
     data = data.split(';')
-    for i, item in enumerate(data):
-        shape_dict = {}
-        shape_dict['dtype'] = []
-        shape_dict['shape'] = []
+    shape_dict = {}
+    for item in data:
         shape_list = item.strip('][').strip('{}').split('},{')
-        for shape in shape_list:
+        for i, shape in enumerate(shape_list):
+            if str(i) not in shape_dict:
+                shape_dict[str(i)] = {}
+                shape_dict[str(i)]['dtype'] = []
+                shape_dict[str(i)]['shape'] = []
             arr = shape.strip('][').split(',[')
             dtype, shape = arr[0], list(map(int, arr[1].split(',')))
-            shape_dict['dtype'].append(dtype)
-            shape_dict['shape'].append(shape)
-        shape_info[str(i)] = shape_dict
+            shape_dict[str(i)]['dtype'].append(dtype)
+            shape_dict[str(i)]['shape'].append(shape)
     
-    config['input_shape'] = shape_info
+    config['input_shape'] = shape_dict
     
     with open(config_file, 'w') as fd:
         yaml.dump(config, fd, default_flow_style=None)
@@ -46,7 +47,7 @@ def main():
 
     lines = fd.readlines()
     for line in lines:
-        print(line)
+        print('infer_input:', line)
         if 'infer_input' in line:
             line = line.strip('infer_input:')
             generate_yaml(line.strip(), args.yaml_file)

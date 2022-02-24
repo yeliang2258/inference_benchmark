@@ -1,4 +1,5 @@
 input_shape:
-  "0": 
-    "shape": [[1, 10]]
-    "dtype": ["float32"]
+  '0':
+    dtype: [float]
+    shape:
+    - [1, 10]

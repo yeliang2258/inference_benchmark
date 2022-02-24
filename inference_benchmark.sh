@@ -8,8 +8,19 @@ config_file=config.yaml
 export BASEPATH=$(cd `dirname $0`; pwd)
 export MODELPATH="$BASEPATH/Models"
 
-echo "============ Benchmark result =============" >> result.txt
-test(){
+generate_config(){
+  for file in $(ls $model_dir)
+    do
+      if [ "${file##*.}"x = "txt"x ];then
+        config_txt_file=${model_dir}/$file
+	yaml_file=${model_dir}/config.yaml
+	python generate_yaml.py --input_file ${config_txt_file} --yaml_file ${yaml_file}
+        echo "find model file: $model_file"
+      fi
+  done
+}
+
+run_benchmark(){
   for backend_type in ${backend_type[@]};do
     if [ "$backend_type" = "onnxruntime" ];then
       if [ ! -f "$model_dir/model.onnx" ];then
@@ -37,9 +48,12 @@ test(){
   done
 }
 
+echo "============ Benchmark result =============" >> result.txt
+
 for dir in $(ls $MODELPATH);do
   CONVERTPATH=$MODELPATH/$dir
   echo " >>>> Model path: $CONVERTPATH"
   export model_dir=$CONVERTPATH
-  test
+  generate_config
+  run_benchmark
 done
