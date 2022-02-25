@@ -54,6 +54,6 @@ for dir in $(ls $MODELPATH);do
   CONVERTPATH=$MODELPATH/$dir
   echo " >>>> Model path: $CONVERTPATH"
   export model_dir=$CONVERTPATH
-  generate_config
+#  generate_config
   run_benchmark
 done

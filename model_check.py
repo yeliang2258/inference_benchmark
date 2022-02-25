@@ -85,13 +85,10 @@ class ModelChecker():
         print(">>>> start check model diff ...... ")
 
         self.paddle_config()
-        self.runner.load(self.args)
-
-        expect_result = self.runner.run()
+        expect_result = self.runner.test(self.args)
 
         self.onnx_config()
-        self.runner.load(self.args)
-        onnx_pred = self.runner.run()
+        onnx_pred = self.runner.test(self.args)
         failed_type = self.compare(onnx_pred, expect_result)
         with open("result.txt", 'a+') as f:
             if not len(failed_type):
