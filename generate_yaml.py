@@ -7,12 +7,11 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--input_file', type=str, default="input.conf")
-    parser.add_argument(
-        '--yaml_file', type=str, default="config.yaml")
+    parser.add_argument('--input_file', type=str, default="input.conf")
+    parser.add_argument('--yaml_file', type=str, default="config.yaml")
     args = parser.parse_args()
     return args
+
 
 def generate_yaml(data, config_file):
     config = {}
@@ -30,9 +29,9 @@ def generate_yaml(data, config_file):
             dtype, shape = arr[0], list(map(int, arr[1].split(',')))
             shape_dict[str(i)]['dtype'].append(dtype)
             shape_dict[str(i)]['shape'].append(shape)
-    
+
     config['input_shape'] = shape_dict
-    
+
     with open(config_file, 'w') as fd:
         yaml.dump(config, fd, default_flow_style=None)
 
@@ -52,6 +51,7 @@ def main():
             line = line.strip('infer_input:')
             generate_yaml(line.strip(), args.yaml_file)
             return
+
 
 if __name__ == "__main__":
     main()
