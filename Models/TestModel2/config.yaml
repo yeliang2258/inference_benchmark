@@ -1,7 +1,11 @@
 input_shape:
-  "0": 
-    "shape": [[-1, 2, 3, 3], [10, 2, 3, 3]]
-    "dtype": ["float32", "float32"]
-  "1": 
-    "shape": [[1], [1]]
-    "dtype": ["float32", "float32"]
+  '0':
+    dtype: [float, float]
+    shape:
+    - [-1, 2, 3, 3]
+    - [10, 2, 3, 3]
+  '1':
+    dtype: [float, float]
+    shape:
+    - [1]
+    - [1]

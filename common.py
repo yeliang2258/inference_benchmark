@@ -16,7 +16,7 @@ import numpy as np
 
 
 def getdtype(self, dtype="float32"):
-    if dtype == "float32":
+    if dtype == "float32" or dtype == "float":
         return np.float32
     if dtype == "float64":
         return np.float64
