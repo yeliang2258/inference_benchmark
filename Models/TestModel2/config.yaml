@@ -2,7 +2,7 @@ input_shape:
   '0':
     dtype: [float, float]
     shape:
-    - [2, 3, 3]
+    - [-1, 2, 3, 3]
     - [10, 2, 3, 3]
   '1':
     dtype: [float, float]
