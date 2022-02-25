@@ -6,13 +6,27 @@
 ```
 
 We provide three scripts:  
-```run.sh```: Start the inference benchmark test, which is divided into two steps: model conversion and benchmark output  
+```run.sh```: Start the inference benchmark test, which is divided into three steps: generate config, model conversion and benchmark output  
 
-```onnx_convert.sh```: Initiate model conversion and accuracy testing of the converted model.  
+```prepare_config.sh```: Generate yaml config.  
+
+```onnx_convert.sh```: Generate yaml configuration file.  
 
 ```inference_benchmark.sh```: Start the benchmark test of the model and output the test results.
 
-## 1. Model Convert And Diff Check
+## 1. Generate yaml configuration file
+
+python generate_yaml.py -h
+```
+usage: generate_yaml.py [-h] [--input_file INPUT_FILE] [--yaml_file YAML_FILE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_file INPUT_FILE
+  --yaml_file YAML_FILE
+```
+
+## 2. Model Convert And Diff Check
 ### Model Convert
 python paddle2onnx -h
 ```
@@ -51,7 +65,7 @@ results has diff : Paddle and ONNX model results has diff.
 shape is not equal : The shapes of Paddle and ONNX model results are not equal.
 dtype is not equal : The dtypes of Paddle and ONNX model results are not equal.
 ```
-## 2. Benchmark Test
+## 3. Benchmark Test
 python benchmark.py --help
 ```
 usage: benchmark.py [-h] [--batch_size BATCH_SIZE] [--input_shape INPUT_SHAPE]
@@ -75,7 +89,7 @@ python benchmark.py --model_dir=data/faster_rcnn_swin_tiny_fpn_1x_coco/ --config
 python benchmark.py --model_dir=./ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --backend_type=onnxruntime --enable_trt=true
 ```
 
-## 3. Benchmark Log
+## 4. Benchmark Log
 
 For example, run ```python benchmark.py --model_dir=data/MobileNetV1/ --config_file=conf/config.yaml --input_shape=3,224,224 --enable_gpu=true --gpu_id=2 --enable_trt=true```
 
