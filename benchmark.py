@@ -223,6 +223,11 @@ class BenchmarkRunner():
         fd.close()
         self.conf.yaml_config = yaml_config
 
+        if self.conf.return_result:
+            self.conf.test_num = 0
+            self.preset()
+            return self.run()
+
         test_num = len(self.conf.yaml_config["input_shape"]["0"]["shape"])
         for i in range(test_num):
             self.conf.test_num = i
