@@ -194,6 +194,7 @@ class BenchmarkRunner():
 
         print('##### benchmark result: #####')
         result = {}
+        result['model_name'] = self.conf.model_dir.split('/')[-1]
         result['detail'] = perf_result
         result['gpu_stat'] = self.gpu_stat.output()
         result['backend_type'] = self.conf.backend_type
