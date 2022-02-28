@@ -31,7 +31,7 @@ run_benchmark(){
         fi
     done
     for batch_size in ${batch_size[@]};do
-      python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --enable_gpu=true --gpu_id=2 --enable_trt=false --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
+      python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --enable_gpu=true --gpu_id=0 --enable_trt=false --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
     done
   done
 }
