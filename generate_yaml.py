@@ -47,8 +47,8 @@ def main():
     lines = fd.readlines()
     for line in lines:
         print('infer_input:', line)
-        if 'infer_input' in line:
-            line = line.strip('infer_input:')
+        if 'random_infer_input' in line:
+            line = line.strip('random_infer_input:')
             generate_yaml(line.strip(), args.yaml_file)
             return
 
