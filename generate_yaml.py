@@ -1,3 +1,17 @@
+#   Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import yaml
 import json
 import sys
@@ -27,6 +41,7 @@ def generate_yaml(data, config_file):
                 shape_dict[str(i)]['shape'] = []
             arr = shape.strip('][').split(',[')
             dtype, shape = arr[0], list(map(int, arr[1].split(',')))
+            shape.insert(0, -1)
             shape_dict[str(i)]['dtype'].append(dtype)
             shape_dict[str(i)]['shape'].append(shape)
 
@@ -34,6 +49,7 @@ def generate_yaml(data, config_file):
 
     with open(config_file, 'w') as fd:
         yaml.dump(config, fd, default_flow_style=None)
+    print(" Generate yaml file: ", config_file, "\n")
 
 
 def main():
@@ -46,11 +62,11 @@ def main():
 
     lines = fd.readlines()
     for line in lines:
-        print('infer_input:', line)
         if 'random_infer_input' in line:
             line = line.strip('random_infer_input:')
             generate_yaml(line.strip(), args.yaml_file)
             return
+    print(" Generate yaml file failed. \n")
 
 
 if __name__ == "__main__":

@@ -6,9 +6,8 @@ generate_config(){
     do
       if [ "${file##*.}"x = "txt"x ];then
         config_txt_file=${model_dir}/$file
-	yaml_file=${model_dir}/config.yaml
-	python generate_yaml.py --input_file ${config_txt_file} --yaml_file ${yaml_file}
-        echo "generate config success, model: $model_dir"
+        yaml_file=${model_dir}/config.yaml
+        python generate_yaml.py --input_file ${config_txt_file} --yaml_file ${yaml_file}
       fi
   done
 }

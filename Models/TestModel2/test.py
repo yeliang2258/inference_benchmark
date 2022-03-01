@@ -28,6 +28,6 @@ class LinearNet(nn.Layer):
 
 layer = LinearNet()
 input_x = paddle.static.InputSpec(shape=[-1, 2, 3, 3])
-input_y = paddle.static.InputSpec(shape=[1])
+input_y = paddle.static.InputSpec(shape=[-1, 2, 3, 3])
 path = "./model"
 paddle.jit.save(layer, path, input_spec=[input_x, input_y])
