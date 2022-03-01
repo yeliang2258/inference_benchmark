@@ -1,1 +1,1 @@
-infer_input:[{float,[1,10]}]
+random_infer_input:[{float,[1,10]}]

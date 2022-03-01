@@ -61,9 +61,9 @@ def main():
 
     lines = fd.readlines()
     for line in lines:
-        if 'infer_input' in line:
-            print('infer_input:', line)
-            line = line.strip('infer_input:')
+        if 'random_infer_input' in line:
+            print('random_infer_input:', line)
+            line = line.strip('random_infer_input:')
             generate_yaml(line.strip(), args.yaml_file)
             return
     print(" Generate yaml file failed. ")
