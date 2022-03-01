@@ -41,6 +41,7 @@ def generate_yaml(data, config_file):
                 shape_dict[str(i)]['shape'] = []
             arr = shape.strip('][').split(',[')
             dtype, shape = arr[0], list(map(int, arr[1].split(',')))
+            shape.insert(0, -1)
             shape_dict[str(i)]['dtype'].append(dtype)
             shape_dict[str(i)]['shape'].append(shape)
 
