@@ -48,7 +48,7 @@ def generate_yaml(data, config_file):
 
     with open(config_file, 'w') as fd:
         yaml.dump(config, fd, default_flow_style=None)
-    print(" Generate yaml file: ", config_file)
+    print(" Generate yaml file: ", config_file, "\n")
 
 
 def main():
@@ -62,11 +62,10 @@ def main():
     lines = fd.readlines()
     for line in lines:
         if 'random_infer_input' in line:
-            print('random_infer_input:', line)
             line = line.strip('random_infer_input:')
             generate_yaml(line.strip(), args.yaml_file)
             return
-    print(" Generate yaml file failed. ")
+    print(" Generate yaml file failed. \n")
 
 
 if __name__ == "__main__":
