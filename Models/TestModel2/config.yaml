@@ -1,9 +1,0 @@
-input_shape:
-  '0':
-    dtype: [float]
-    shape:
-    - [-1, 2, 3, 3]
-  '1':
-    dtype: [float]
-    shape:
-    - [-1, 2, 3, 3]
