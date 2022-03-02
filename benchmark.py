@@ -196,7 +196,11 @@ class BenchmarkRunner():
         result = {}
         result['model_name'] = self.conf.model_dir.split('/')[-1]
         result['detail'] = perf_result
+        result['avg_cost'] = perf_result['result']['avg_cost']
         result['gpu_stat'] = self.gpu_stat.output()
+        if self.conf.enable_gpu:
+            result['device_name'] = result['gpu_stat']['name']
+            result['gpu_mem'] = result['gpu_stat']['memory.used']
         result['backend_type'] = self.conf.backend_type
         result['batch_size'] = self.conf.batch_size
         result['precision'] = self.conf.precision
