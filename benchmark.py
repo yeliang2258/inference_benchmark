@@ -116,7 +116,7 @@ def parse_args():
         '--paddle_model_file', type=str, default="model.pdmodel")
     parser.add_argument(
         '--paddle_params_file', type=str, default="model.pdiparams")
-    parser.add_argument('--enable_mkldnn', type=str2bool, default=True)
+    parser.add_argument('--enable_mkldnn', type=str2bool, default=False)
     parser.add_argument('--enable_openvino', type=str2bool, default=False)
     parser.add_argument('--enable_gpu', type=str2bool, default=False)
     parser.add_argument('--enable_trt', type=str2bool, default=False)
