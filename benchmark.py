@@ -204,6 +204,7 @@ class BenchmarkRunner():
         result['backend_type'] = self.conf.backend_type
         result['batch_size'] = self.conf.batch_size
         result['precision'] = self.conf.precision
+        result['enable_mkldnn'] = self.conf.enable_mkldnn
         result['enable_gpu'] = self.conf.enable_gpu
         result['enable_trt'] = self.conf.enable_trt
         print(result)
