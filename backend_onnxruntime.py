@@ -47,9 +47,12 @@ class BackendOnnxruntime(backend.Backend):
         if self.args.enable_openvino and not self.args.enable_gpu:
             self.sess = ort.InferenceSession(
                 model_file, providers=['OpenVINOExecutionProvider'])
-        if self.args.enable_mkldnn and not self.args.enable_gpu:
+        if not self.args.enable_mkldnn and not self.args.enable_gpu:
             self.sess = ort.InferenceSession(
                 model_file, providers=['CPUExecutionProvider'])
+        if self.args.enable_mkldnn and not self.args.enable_gpu:
+            self.sess = ort.InferenceSession(
+                model_file, providers=['DnnlExecutionProvider'])
         if self.args.enable_gpu:
             option_maps = {}
             option_maps['device_id'] = str(self.args.gpu_id)
