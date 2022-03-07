@@ -3,4 +3,4 @@ pandas
 pyyaml
 psutil
 openpyxl
-onnxruntime
+onnxruntime-gpu
