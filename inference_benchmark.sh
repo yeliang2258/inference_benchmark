@@ -10,7 +10,7 @@ export BASEPATH=$(cd `dirname $0`; pwd)
 export MODELPATH="$BASEPATH/Models"
 
 run_benchmark(){
-  for backend_type in ${backend_type[@]};do
+  for backend_type in ${backend_type_list[@]};do
     if [ "$backend_type" = "onnxruntime" ];then
       if [ ! -f "$model_dir/model.onnx" ];then
          echo "cont find ONNX model file. "
