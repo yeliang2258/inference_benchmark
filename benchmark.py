@@ -205,6 +205,7 @@ class BenchmarkRunner():
         result['batch_size'] = self.conf.batch_size
         result['precision'] = self.conf.precision
         result['cpu_threads'] = self.conf.cpu_threads
+        result['cpu_mem'] = 0
         result['enable_mkldnn'] = self.conf.enable_mkldnn
         result['enable_gpu'] = self.conf.enable_gpu
         result['enable_trt'] = self.conf.enable_trt
