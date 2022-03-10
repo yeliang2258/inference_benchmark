@@ -16,6 +16,7 @@ import argparse
 import os
 import logging
 import yaml
+from common import getdtype, randtool
 
 from benchmark import *
 
@@ -34,7 +35,6 @@ class ModelChecker():
     def __init__(self, args):
         self.args = args
         self.runner = BenchmarkRunner()
-        print("test yaml file path: ", self.args.config_file)
 
     def onnx_config(self):
         self.args.return_result = True
@@ -83,6 +83,23 @@ class ModelChecker():
                 f.write(self.args.model_dir + ": convert failed! \n")
             return
         print(">>>> start check model diff ...... ")
+
+        config_path = os.path.abspath(self.args.model_dir + "/" +
+                                      self.args.config_file)
+        try:
+            fd = open(config_path)
+        except Exception as e:
+            raise ValueError("open config file failed.")
+        yaml_config = yaml.load(fd, yaml.FullLoader)
+        fd.close()
+        input_data = []
+        for i, val in enumerate(yaml_config["input_shape"]):
+            input_shape = yaml_config["input_shape"][val]
+            shape = [1] + input_shape["shape"][0][1:]
+            dtype = input_shape["dtype"][0]
+            data = randtool(dtype, -1, 1, shape)
+            input_data.append(data)
+        self.args.test_data = input_data
 
         self.paddle_config()
         expect_result = self.runner.test(self.args)
