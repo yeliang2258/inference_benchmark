@@ -24,3 +24,17 @@ def getdtype(self, dtype="float32"):
         return np.int32
     if dtype == "int64":
         return np.int64
+
+
+def randtool(dtype, low, high, shape):
+    """
+    np random tools
+    """
+    data = None
+    if dtype.count("int"):
+        data = np.random.randint(low, high, shape)
+    elif dtype.count("float"):
+        data = low + (high - low) * np.random.random(shape)
+    elif dtype.count("bool"):
+        data = np.random.randint(low, high, shape)
+    return data.astype(getdtype(dtype))

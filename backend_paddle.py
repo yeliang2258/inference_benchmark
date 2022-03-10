@@ -78,7 +78,6 @@ class BackendPaddle(backend.Backend):
         self.predictor = paddle_infer.create_predictor(config)
 
         input_shape = self.args.yaml_config["input_shape"]
-        print(input_shape)
         if len(input_shape) <= 0:
             raise Exception("input shape is empty.")
 
@@ -100,7 +99,10 @@ class BackendPaddle(backend.Backend):
                     "shape"][self.args.test_num]
                 dtype = self.args.yaml_config["input_shape"][str(i)]["dtype"][
                     self.args.test_num]
-            fake_input = np.ones(input_shape, dtype=getdtype(dtype))
+            if hasattr(self.args, "test_data"):
+                fake_input = self.args.test_data[i].astype(getdtype(dtype))
+            else:
+                fake_input = np.ones(input_shape, dtype=getdtype(dtype))
             input_tensor.reshape(input_shape)
             input_tensor.copy_from_cpu(fake_input.copy())
 
