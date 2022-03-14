@@ -140,12 +140,12 @@ def data_merging(env, paddle_version, onnxruntime_version,
                 log_dict["enable_mkldnn"] = output_dict["enable_mkldnn"]
                 log_dict["cpu_threads"] = output_dict["cpu_threads"]
                 log_dict["enable_trt"] = output_dict["enable_trt"]
-                log_dict["onnxruntime_cpu_mem"] = comp_list["cpu_mem"]
-                log_dict["paddle_cpu_mem"] = output_dict["cpu_mem"]
-                log_dict["paddle_gpu_mem"] = output_dict["gpu_mem"]
-                log_dict["onnxruntime_gpu_mem"] = comp_list["gpu_mem"]
-                log_dict["paddle_avg_cost"] = output_dict["avg_cost"]
-                log_dict["onnxruntime_avg_cost"] = comp_list["avg_cost"]
+                log_dict["onnxruntime_cpu_mem"] = output_dict["cpu_mem"]
+                log_dict["paddle_cpu_mem"] = comp_list["cpu_mem"]
+                log_dict["paddle_gpu_mem"] = comp_list["gpu_mem"]
+                log_dict["onnxruntime_gpu_mem"] = output_dict["gpu_mem"]
+                log_dict["paddle_avg_cost"] = comp_list["avg_cost"]
+                log_dict["onnxruntime_avg_cost"] = output_dict["avg_cost"]
                 log_dict["cpu_mem_gap"] = calculation_gap(
                     paddle_num=log_dict["paddle_cpu_mem"],
                     onnxruntime_num=log_dict["paddle_cpu_mem"])
@@ -188,8 +188,8 @@ def main(args, result_path, tipc_benchmark_excel_path):
         "日期", "环境", "paddle_version", "onnxruntime_version", "device_name",
         "model_name", "precision", "batch_size", "enable_mkldnn",
         "cpu_threads", "enable_gpu", "enable_trt", "paddle2onnx_model_convert",
-        "onnxruntime_cpu_mem", "paddle_cpu_mem", "paddle_gpu_mem",
-        "onnxruntime_gpu_mem", "onnxruntime_avg_cost", "paddle_avg_cost",
+        "onnxruntime_cpu_mem", "paddle_cpu_mem", "onnxruntime_gpu_mem",
+        "paddle_gpu_mem", "onnxruntime_avg_cost", "paddle_avg_cost",
         "cpu_mem_gap", "gpu_mem_gap", "perf_gap"
     ])
 
@@ -213,4 +213,3 @@ if __name__ == "__main__":
     result_path = args.result_path
     tipc_benchmark_excel_path = args.output_name
     main(args, result_path, tipc_benchmark_excel_path)
-
