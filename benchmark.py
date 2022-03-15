@@ -77,7 +77,10 @@ class GPUStat(GPUStatBase):
         result = gpu_info_list[0]
         for item in gpu_info_list:
             for k in item.keys():
-                result[k] = max(result[k], item[k])
+                if k not in ["name", "uuid", "timestamp"]:
+                    result[k] = max(int(result[k]), int(item[k]))
+                else:
+                    result[k] = max(result[k], item[k])
         self.result = result
 
     def output(self):
@@ -165,6 +168,9 @@ class BenchmarkRunner():
         self.warmup_times = 20
         self.run_times = 100
         self.time_data = []
+        self.h2d_time = []
+        self.d2h_time = []
+        self.compute_time = []
         self.backend = None
         self.conf = None
 
@@ -182,10 +188,14 @@ class BenchmarkRunner():
         for i in range(self.warmup_times):
             self.backend.predict()
 
+        self.backend.reset()
         for i in range(self.run_times):
             begin = time.time()
             self.backend.predict()
             self.time_data.append(time.time() - begin)
+        self.h2d_time = self.backend.h2d_time
+        self.d2h_time = self.backend.d2h_time
+        self.compute_time = self.backend.compute_time
 
     def report(self):
         self.gpu_stat.stop()
@@ -197,6 +207,13 @@ class BenchmarkRunner():
         result['model_name'] = self.conf.model_dir.split('/')[-1]
         result['detail'] = perf_result
         result['avg_cost'] = perf_result['result']['avg_cost']
+        result['h2d_cost'] = float(format(np.mean(
+            self.h2d_time), '.6f')) if len(self.h2d_time) > 0 else 0
+        result['d2h_cost'] = float(format(np.mean(
+            self.d2h_time), '.6f')) if len(self.d2h_time) > 0 else 0
+        result['compute_cost'] = float(
+            format(np.mean(self.compute_time), '.6f')) if len(
+                self.compute_time) > 0 else 0
         result['gpu_stat'] = self.gpu_stat.output()
         if self.conf.enable_gpu:
             result['device_name'] = result['gpu_stat']['name']

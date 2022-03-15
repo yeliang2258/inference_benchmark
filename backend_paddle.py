@@ -15,6 +15,7 @@
 import backend
 import os
 import sys
+import time
 import numpy as np
 from common import getdtype
 
@@ -28,6 +29,9 @@ except Exception as e:
 class BackendPaddle(backend.Backend):
     def __init__(self):
         super(BackendPaddle, self).__init__()
+        self.h2d_time = []
+        self.compute_time = []
+        self.d2h_time = []
 
     def version(self):
         # paddle.version.commit
@@ -117,15 +121,27 @@ class BackendPaddle(backend.Backend):
         if self.args.return_result:
             return results
 
+    def reset(self):
+        self.h2d_time.clear()
+        self.d2h_time.clear()
+        self.compute_time.clear()
+
     def warmup(self):
         # for i range(self.args.warmup):
         #     self.predictor.run()
         pass
 
     def predict(self, feed=None):
+        h2d_begin = time.time()
         self.set_input()
+        h2d_end = time.time()
         self.predictor.run()
+        d2h_begin = time.time()
         output = self.set_output()
+        d2h_end = time.time()
+        self.h2d_time.append(h2d_end - h2d_begin)
+        self.compute_time.append(d2h_begin - h2d_end)
+        self.d2h_time.append(d2h_end - d2h_begin)
         if self.args.return_result:
             return output
 

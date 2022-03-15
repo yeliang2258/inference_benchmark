@@ -27,6 +27,9 @@ except Exception as e:
 class BackendOnnxruntime(backend.Backend):
     def __init__(self):
         super(BackendOnnxruntime, self).__init__()
+        self.h2d_time = []
+        self.compute_time = []
+        self.d2h_time = []
 
     def version(self):
         # paddle.version.commit
@@ -68,6 +71,11 @@ class BackendOnnxruntime(backend.Backend):
                     provider_options=provider_options)
 
         return self
+
+    def reset(self):
+        self.h2d_time.clear()
+        self.d2h_time.clear()
+        self.compute_time.clear()
 
     def warmup(self):
         pass
