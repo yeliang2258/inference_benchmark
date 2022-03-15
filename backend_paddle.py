@@ -70,10 +70,15 @@ class BackendPaddle(backend.Backend):
         if self.args.enable_gpu:
             config.enable_use_gpu(256, self.args.gpu_id)
             if self.args.enable_trt:
+                max_batch_size = self.args.batch_size
+                if self.args.yaml_config["input_shape"]["0"]["shape"][
+                        self.args.test_num][0] != -1:
+                    max_batch_size = self.args.yaml_config["input_shape"]["0"][
+                        "shape"][self.args.test_num][0]
                 config.enable_tensorrt_engine(
                     workspace_size=1 << 30,
                     precision_mode=paddle_infer.PrecisionType.Float32,
-                    max_batch_size=20,
+                    max_batch_size=max_batch_size,
                     min_subgraph_size=3)
         #config.disable_glog_info()
         pass_builder = config.pass_builder()
