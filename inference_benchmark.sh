@@ -1,3 +1,4 @@
+export FLAGS_cudnn_exhaustive_search=1
 
 backend_type_list=(onnxruntime paddle)
 enable_trt_list=(true false)
