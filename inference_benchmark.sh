@@ -2,7 +2,7 @@ export FLAGS_cudnn_exhaustive_search=1
 
 backend_type_list=(onnxruntime paddle)
 enable_trt_list=(true false)
-enable_gpu_list=(true false)
+enable_gpu_list=(true)
 enable_mkldnn_list=(true false)
 gpu_id=0
 batch_size_list=(1 8 16)
