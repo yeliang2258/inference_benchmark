@@ -112,8 +112,7 @@ class BackendPaddle(backend.Backend):
                 fake_input = self.args.test_data[i].astype(getdtype(dtype))
             else:
                 fake_input = np.ones(input_shape, dtype=getdtype(dtype))
-            input_tensor.reshape(input_shape)
-            input_tensor.copy_from_cpu(fake_input.copy())
+            input_tensor.copy_from_cpu(fake_input)
 
     def set_output(self):
         results = []
@@ -122,7 +121,8 @@ class BackendPaddle(backend.Backend):
         for i, name in enumerate(output_names):
             output_tensor = self.predictor.get_output_handle(name)
             output_data = output_tensor.copy_to_cpu()
-            results.append(output_data)
+            if self.args.return_result:
+                results.append(output_data)
         if self.args.return_result:
             return results
 
@@ -137,16 +137,9 @@ class BackendPaddle(backend.Backend):
         pass
 
     def predict(self, feed=None):
-        h2d_begin = time.time()
         self.set_input()
-        h2d_end = time.time()
         self.predictor.run()
-        d2h_begin = time.time()
         output = self.set_output()
-        d2h_end = time.time()
-        self.h2d_time.append(h2d_end - h2d_begin)
-        self.compute_time.append(d2h_begin - h2d_end)
-        self.d2h_time.append(d2h_end - d2h_begin)
         if self.args.return_result:
             return output
 
