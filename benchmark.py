@@ -147,16 +147,17 @@ def get_backend(backend):
 def parse_time(time_data, result_dict):
     percentiles = [50., 80., 90., 95., 99., 99.9]
     buckets = np.percentile(time_data, percentiles).tolist()
-    buckets_str = ",".join(
-        ["{}:{:.4f}".format(p, b) for p, b in zip(percentiles, buckets)])
+    buckets_str = ",".join([
+        "{}:{:.4f}".format(p, b * 1000) for p, b in zip(percentiles, buckets)
+    ])
     # if result_dict["total"] == 0:
     result_dict["total"] = len(time_data)
     result_dict["result"] = {
-        str(k): float(format(v, '.6f'))
+        str(k): float(format(v * 1000, '.4f'))
         for k, v in zip(percentiles, buckets)
     }
     avg_cost = np.mean(time_data)
-    result_dict["result"]['avg_cost'] = float(format(avg_cost, '.6f'))
+    result_dict["result"]['avg_cost'] = float(format(avg_cost * 1000, '.4f'))
 
 
 def parse_config(conf):
@@ -187,15 +188,15 @@ class BenchmarkRunner():
 
         for i in range(self.warmup_times):
             self.backend.predict()
-       
+
         run_count = 0
         min_run_time = 0
         self.backend.reset()
-        while (run_count < self.run_times ) or (min_run_time < 2):
+        while (run_count < self.run_times) or (min_run_time < 2):
             begin = time.time()
             self.backend.predict()
             local_time = time.time() - begin
-            min_run_time += local_time 
+            min_run_time += local_time
             run_count = run_count + 1
             self.time_data.append(local_time)
 
