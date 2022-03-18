@@ -1,4 +1,6 @@
 export FLAGS_cudnn_exhaustive_search=1
+export FLAGS_fraction_of_gpu_memory_to_use=0.01
+export FLAGS_allocator_strategy=naive_best_fit
 
 backend_type_list=(onnxruntime paddle)
 enable_trt_list=(true false)

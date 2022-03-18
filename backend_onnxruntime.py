@@ -56,19 +56,42 @@ class BackendOnnxruntime(backend.Backend):
             self.sess = ort.InferenceSession(
                 model_file, providers=['DnnlExecutionProvider'])
         if self.args.enable_gpu:
-            option_maps = {}
-            option_maps['device_id'] = str(self.args.gpu_id)
-            provider_options = [option_maps]
+            trt_providers = [
+            ('TensorrtExecutionProvider', {
+                'device_id': self.args.gpu_id,
+                'trt_max_workspace_size': 1073741824,
+                'trt_fp16_enable': False,
+            }),
+            ('CUDAExecutionProvider', {
+                'device_id': self.args.gpu_id,
+                'arena_extend_strategy': 'kNextPowerOfTwo',
+                'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
+                'cudnn_conv_algo_search': 'EXHAUSTIVE',
+                'do_copy_in_default_stream': True,
+            })
+            ]
+
+            cuda_providers = [
+                ('CUDAExecutionProvider', {
+                    'device_id': self.args.gpu_id,
+                    'arena_extend_strategy': 'kNextPowerOfTwo',
+                    'cudnn_conv_algo_search': 'EXHAUSTIVE',
+                    'do_copy_in_default_stream': True,
+                }),
+                'CPUExecutionProvider',
+            ]
+            print(trt_providers)
+
+            sess_opt = ort.SessionOptions()
             if self.args.enable_trt:
                 self.sess = ort.InferenceSession(
                     model_file,
-                    providers=['TensorrtExecutionProvider'],
-                    provider_options=provider_options)
+                    sess_options=sess_opt,
+                    providers=trt_providers)
             else:
                 self.sess = ort.InferenceSession(
                     model_file,
-                    providers=['CUDAExecutionProvider'],
-                    provider_options=provider_options)
+                    providers=cuda_providers)
 
         return self
 
