@@ -46,30 +46,30 @@ class BackendOnnxruntime(backend.Backend):
             raise ValueError(
                 f"The model dir {self.args.model_dir} does not exists!")
 
+        sess_opt = ort.SessionOptions()
+        sess_opt.intra_op_num_threads = self.args.cpu_threads
+
         if self.args.enable_openvino and not self.args.enable_gpu:
-            self.sess = ort.InferenceSession(
-                model_file, providers=['OpenVINOExecutionProvider'])
+            run_providers = ['OpenVINOExecutionProvider']
+
         if not self.args.enable_mkldnn and not self.args.enable_gpu:
-            self.sess = ort.InferenceSession(
-                model_file, providers=['CPUExecutionProvider'])
+            run_providers = ['CPUExecutionProvider']
+
         if self.args.enable_mkldnn and not self.args.enable_gpu:
-            self.sess = ort.InferenceSession(
-                model_file, providers=['DnnlExecutionProvider'])
+            run_providers = ['DnnlExecutionProvider']
+
         if self.args.enable_gpu:
-            trt_providers = [
-            ('TensorrtExecutionProvider', {
+            trt_providers = [('TensorrtExecutionProvider', {
                 'device_id': self.args.gpu_id,
                 'trt_max_workspace_size': 1073741824,
                 'trt_fp16_enable': False,
-            }),
-            ('CUDAExecutionProvider', {
+            }), ('CUDAExecutionProvider', {
                 'device_id': self.args.gpu_id,
                 'arena_extend_strategy': 'kNextPowerOfTwo',
                 'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
                 'cudnn_conv_algo_search': 'EXHAUSTIVE',
                 'do_copy_in_default_stream': True,
-            })
-            ]
+            })]
 
             cuda_providers = [
                 ('CUDAExecutionProvider', {
@@ -80,18 +80,14 @@ class BackendOnnxruntime(backend.Backend):
                 }),
                 'CPUExecutionProvider',
             ]
-            print(trt_providers)
 
-            sess_opt = ort.SessionOptions()
             if self.args.enable_trt:
-                self.sess = ort.InferenceSession(
-                    model_file,
-                    sess_options=sess_opt,
-                    providers=trt_providers)
+                run_providers = trt_providers
             else:
-                self.sess = ort.InferenceSession(
-                    model_file,
-                    providers=cuda_providers)
+                run_providers = cuda_providers
+
+        self.sess = ort.InferenceSession(
+            model_file, sess_options=sess_opt, providers=run_providers)
 
         return self
 
