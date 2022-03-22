@@ -102,10 +102,22 @@ class ModelChecker():
         self.args.test_data = input_data
 
         self.paddle_config()
-        expect_result = self.runner.test(self.args)
+        try:
+            expect_result = self.runner.test(self.args)
+        except Exception as e:
+            with open("result.txt", 'a+') as f:
+                f.write(self.args.model_dir + ": paddle infer failed! \n")
+            raise ValueError(self.args.model_dir + ": paddle infer failed!")
 
         self.onnx_config()
-        onnx_pred = self.runner.test(self.args)
+        try:
+            onnx_pred = self.runner.test(self.args)
+        except Exception as e:
+            with open("result.txt", 'a+') as f:
+                f.write(self.args.model_dir + ": onnxruntime infer failed! \n")
+            raise ValueError(self.args.model_dir +
+                             ": onnxruntime infer failed!")
+
         failed_type = self.compare(onnx_pred, expect_result)
         with open("result.txt", 'a+') as f:
             if not len(failed_type):
