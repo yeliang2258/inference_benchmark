@@ -9,10 +9,16 @@ install_repo(){
   $PYTHON_CMD setup.py install
 }
 
-install_repo
 rm -r result.txt
 rm -r *.pdmodel
 rm -r *.dot
+for dir in $(ls $MODELPATH)
+do
+  CONVERTPATH=$MODELPATH/$dir
+  cd $CONVERTPATH
+  rm -r model.onnx
+  cd $BASEPATH
+done
 
 echo "============ covert and diff check result =============" >> result.txt
 for dir in $(ls $MODELPATH)

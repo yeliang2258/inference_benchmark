@@ -110,9 +110,11 @@ class ModelChecker():
         with open("result.txt", 'a+') as f:
             if not len(failed_type):
                 f.write(self.args.model_dir + ": convert success! \n")
+                print(">>>> check model diff success! ")
+                return
             for i in range(len(failed_type)):
                 f.write(self.args.model_dir + ": " + failed_type[i] + "\n")
-        print(">>>> end check model diff ! ")
+            print(">>>> check model diff failed! ")
 
 
 def main():
