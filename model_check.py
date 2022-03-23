@@ -52,8 +52,8 @@ class ModelChecker():
             res = np.allclose(
                 result, expect, atol=delta, rtol=rtol, equal_nan=True)
             # 出错打印错误数据
+            diff = abs(result - expect)
             if res is False:
-                diff = abs(result - expect)
                 logging.error("Output has diff! max diff: {}".format(
                     np.amax(diff)))
             if result.dtype != expect.dtype:
@@ -62,7 +62,10 @@ class ModelChecker():
                     format(result.dtype, expect.dtype))
             failed_type = []
             if not res:
-                failed_type.append(" results has diff ")
+                if np.isnan(diff).any():
+                    failed_type.append(" results have Nan ")
+                else:
+                    failed_type.append(" results have diff ")
             if not result.shape == expect.shape:
                 failed_type.append(" shape is not equal ")
             if not result.dtype == expect.dtype:
