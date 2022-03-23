@@ -1,6 +1,5 @@
 export FLAGS_cudnn_exhaustive_search=1
-export FLAGS_fraction_of_gpu_memory_to_use=0.01
-export FLAGS_allocator_strategy=naive_best_fit
+export FLAGS_allocator_strategy=auto_growth
 
 backend_type_list=(onnxruntime paddle)
 enable_trt_list=(true false)
@@ -8,6 +7,7 @@ enable_gpu_list=(true)
 enable_mkldnn_list=(true false)
 gpu_id=0
 batch_size_list=(1 8 16)
+precision_list=(fp32 fp16)
 config_file=config.yaml
 export BASEPATH=$(cd `dirname $0`; pwd)
 export MODELPATH="$BASEPATH/Models"
@@ -38,7 +38,13 @@ run_benchmark(){
       for enable_gpu in ${enable_gpu_list[@]};do
         if [ ${enable_gpu} = "true" ]; then
           for enable_trt in ${enable_trt_list[@]};do
-            python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --enable_gpu=${enable_gpu} --gpu_id=${gpu_id} --enable_trt=${enable_trt} --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
+            if [ ${enable_trt} = "true" ]; then
+                for precision in ${precision_list[@]};do
+                    python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --precision ${precision} --enable_gpu=${enable_gpu} --gpu_id=${gpu_id} --enable_trt=${enable_trt} --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
+                done
+            elif [ ${enable_trt} = "false" ]; then
+                python benchmark.py --model_dir=${model_dir} --config_file ${config_file} --precision fp32 --enable_gpu=${enable_gpu} --gpu_id=${gpu_id} --enable_trt=${enable_trt} --backend_type=${backend_type} --batch_size=${batch_size} --paddle_model_file "$model_file" --paddle_params_file "$params_file"
+            fi
           done
         elif [ ${enable_gpu} = "false" ]; then
           for enable_mkldnn in ${enable_mkldnn_list[@]};do

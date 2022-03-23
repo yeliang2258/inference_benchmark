@@ -59,6 +59,10 @@ class BackendPaddle(backend.Backend):
         config.switch_ir_optim(True)
         # debug
         # config.switch_ir_debug()
+        precision_mode = paddle_infer.PrecisionType.Float32
+        if self.args.precision == 'fp16':
+            precision_mode = paddle_infer.PrecisionType.Half
+
         if self.args.enable_mkldnn and not self.args.enable_gpu:
             config.disable_gpu()
             config.enable_mkldnn()
@@ -69,6 +73,9 @@ class BackendPaddle(backend.Backend):
             config.enable_profile()
         if self.args.enable_gpu:
             config.enable_use_gpu(256, self.args.gpu_id)
+            # experiment
+            # if self.args.precision == 'fp16':
+            #     config.exp_enable_use_gpu_fp16()
             if self.args.enable_trt:
                 max_batch_size = self.args.batch_size
                 if self.args.yaml_config["input_shape"]["0"]["shape"][
@@ -77,7 +84,7 @@ class BackendPaddle(backend.Backend):
                         "shape"][self.args.test_num][0]
                 config.enable_tensorrt_engine(
                     workspace_size=1 << 30,
-                    precision_mode=paddle_infer.PrecisionType.Float32,
+                    precision_mode=precision_mode,
                     max_batch_size=max_batch_size,
                     min_subgraph_size=3)
         #config.disable_glog_info()

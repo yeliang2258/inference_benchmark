@@ -48,6 +48,8 @@ class BackendOnnxruntime(backend.Backend):
 
         sess_opt = ort.SessionOptions()
         sess_opt.intra_op_num_threads = self.args.cpu_threads
+        if self.args.enable_profile:
+            sess_opt.enable_profiling = True
 
         if self.args.enable_openvino and not self.args.enable_gpu:
             run_providers = ['OpenVINOExecutionProvider']
@@ -62,7 +64,8 @@ class BackendOnnxruntime(backend.Backend):
             trt_providers = [('TensorrtExecutionProvider', {
                 'device_id': self.args.gpu_id,
                 'trt_max_workspace_size': 1073741824,
-                'trt_fp16_enable': False,
+                'trt_fp16_enable': True
+                if self.args.precision == 'fp16' else False,
             }), ('CUDAExecutionProvider', {
                 'device_id': self.args.gpu_id,
                 'arena_extend_strategy': 'kNextPowerOfTwo',
