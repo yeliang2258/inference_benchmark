@@ -52,8 +52,8 @@ class ModelChecker():
             res = np.allclose(
                 result, expect, atol=delta, rtol=rtol, equal_nan=True)
             # 出错打印错误数据
+            diff = abs(result - expect)
             if res is False:
-                diff = abs(result - expect)
                 logging.error("Output has diff! max diff: {}".format(
                     np.amax(diff)))
             if result.dtype != expect.dtype:
@@ -62,7 +62,10 @@ class ModelChecker():
                     format(result.dtype, expect.dtype))
             failed_type = []
             if not res:
-                failed_type.append(" results has diff ")
+                if np.isnan(diff).any():
+                    failed_type.append(" results have Nan ")
+                else:
+                    failed_type.append(" results have diff ")
             if not result.shape == expect.shape:
                 failed_type.append(" shape is not equal ")
             if not result.dtype == expect.dtype:
@@ -102,17 +105,35 @@ class ModelChecker():
         self.args.test_data = input_data
 
         self.paddle_config()
-        expect_result = self.runner.test(self.args)
+        try:
+            expect_result = self.runner.test(self.args)
+        except Exception as e:
+            with open("result.txt", 'a+') as f:
+                f.write(self.args.model_dir +
+                        ": convert failed(paddle infer failed!) \n")
+            raise ValueError(self.args.model_dir +
+                             ": convert failed(paddle infer failed!)")
 
         self.onnx_config()
-        onnx_pred = self.runner.test(self.args)
+        try:
+            onnx_pred = self.runner.test(self.args)
+        except Exception as e:
+            with open("result.txt", 'a+') as f:
+                f.write(self.args.model_dir +
+                        ": convert failed(onnxruntime infer failed!) \n")
+            raise ValueError(self.args.model_dir +
+                             ": convert failed(onnxruntime infer failed!)")
+
         failed_type = self.compare(onnx_pred, expect_result)
         with open("result.txt", 'a+') as f:
             if not len(failed_type):
                 f.write(self.args.model_dir + ": convert success! \n")
+                print(">>>> check model diff success! ")
+                return
             for i in range(len(failed_type)):
-                f.write(self.args.model_dir + ": " + failed_type[i] + "\n")
-        print(">>>> end check model diff ! ")
+                f.write(self.args.model_dir + ": convert failed(" +
+                        failed_type[i] + ")\n")
+            print(">>>> check model diff failed! ")
 
 
 def main():
