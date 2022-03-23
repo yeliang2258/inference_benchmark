@@ -109,17 +109,20 @@ class ModelChecker():
             expect_result = self.runner.test(self.args)
         except Exception as e:
             with open("result.txt", 'a+') as f:
-                f.write(self.args.model_dir + ": paddle infer failed! \n")
-            raise ValueError(self.args.model_dir + ": paddle infer failed!")
+                f.write(self.args.model_dir +
+                        ": convert failed(paddle infer failed!) \n")
+            raise ValueError(self.args.model_dir +
+                             ": convert failed(paddle infer failed!)")
 
         self.onnx_config()
         try:
             onnx_pred = self.runner.test(self.args)
         except Exception as e:
             with open("result.txt", 'a+') as f:
-                f.write(self.args.model_dir + ": onnxruntime infer failed! \n")
+                f.write(self.args.model_dir +
+                        ": convert failed(onnxruntime infer failed!) \n")
             raise ValueError(self.args.model_dir +
-                             ": onnxruntime infer failed!")
+                             ": convert failed(onnxruntime infer failed!)")
 
         failed_type = self.compare(onnx_pred, expect_result)
         with open("result.txt", 'a+') as f:
@@ -128,7 +131,8 @@ class ModelChecker():
                 print(">>>> check model diff success! ")
                 return
             for i in range(len(failed_type)):
-                f.write(self.args.model_dir + ": " + failed_type[i] + "\n")
+                f.write(self.args.model_dir + ": convert failed(" +
+                        failed_type[i] + ")\n")
             print(">>>> check model diff failed! ")
 
 
