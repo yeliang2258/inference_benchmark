@@ -2,6 +2,7 @@ export PYTHON_CMD=python
 export BASEPATH=$(cd `dirname $0`; pwd)
 export MODELPATH="$BASEPATH/Models"
 install_repo(){
+  $PYTHON_CMD -m pip uninstall paddle2onnx
   cd "$BASEPATH"
   rm -rf Paddle2ONNX
   git clone https://github.com/PaddlePaddle/Paddle2ONNX.git
