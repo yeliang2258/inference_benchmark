@@ -10,6 +10,8 @@ install_repo(){
   $PYTHON_CMD setup.py install
 }
 
+install_repo
+
 rm -r result.txt
 rm -r *.pdmodel
 rm -r *.dot
